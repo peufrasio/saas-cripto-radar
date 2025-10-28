@@ -52,7 +52,8 @@ export async function signIn(email: string, password: string) {
     const userData = {
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      user_metadata: { role: user.role }
     }
 
     if (typeof window !== 'undefined') {
@@ -60,6 +61,9 @@ export async function signIn(email: string, password: string) {
       
       // Salvar no cookie também para o middleware
       document.cookie = `cryptosage_user=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=86400; SameSite=Lax`
+      
+      // Aguardar um pouco para garantir que o cookie foi salvo
+      await new Promise(resolve => setTimeout(resolve, 100))
     }
 
     return { user: userData, error: null }

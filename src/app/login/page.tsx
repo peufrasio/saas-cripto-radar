@@ -19,20 +19,22 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { user, error: authError } = await signIn(email, password)
+    try {
+      const { user, error: authError } = await signIn(email, password)
 
-    if (authError) {
-      setError(authError)
-      setLoading(false)
-      return
-    }
+      if (authError) {
+        setError(authError)
+        setLoading(false)
+        return
+      }
 
-    if (user) {
-      // Aguardar um pouco para garantir que o cookie foi salvo
-      setTimeout(() => {
-        router.push('/dashboard')
-        router.refresh()
-      }, 100)
+      if (user) {
+        // Redirecionamento imediato e forçado
+        window.location.href = '/dashboard'
+        return
+      }
+    } catch (error: any) {
+      setError(error.message || 'Erro no login')
     }
 
     setLoading(false)
