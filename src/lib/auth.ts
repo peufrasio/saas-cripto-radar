@@ -30,6 +30,24 @@ export async function signUp(email: string, password: string) {
 
 export async function signIn(email: string, password: string) {
   try {
+    // Verificar se é o admin padrão
+    if (email === 'admin' && password === 'admin1234') {
+      const adminUser = {
+        id: 'admin-default',
+        email: 'admin@cryptosage.ai',
+        role: 'admin',
+        user_metadata: { role: 'admin' }
+      }
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('cryptosage_user', JSON.stringify(adminUser))
+        document.cookie = `cryptosage_user=${encodeURIComponent(JSON.stringify(adminUser))}; path=/; max-age=86400; SameSite=Lax`
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+
+      return { user: adminUser, error: null }
+    }
+
     // Buscar usuário por email
     const { data: user, error } = await supabase
       .from('users')

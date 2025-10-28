@@ -1,321 +1,338 @@
 'use client'
 
-import { useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
-import { Users, Activity, Settings, Database, Shield, TrendingUp } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { 
+  Users, 
+  CreditCard, 
+  Bell, 
+  TrendingUp, 
+  Newspaper, 
+  Bot,
+  Activity,
+  DollarSign,
+  Eye,
+  AlertTriangle
+} from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
 
-export default function AdminPage() {
-  const { user } = useAuth()
-  const [activeTab, setActiveTab] = useState('overview')
+export default function AdminDashboard() {
+  const [stats, setStats] = useState({
+    activeUsers: 1284,
+    paidPlans: 67,
+    alertsSent: 3210,
+    successRate: 74,
+    newsUpdated: 12,
+    aiSessions: 3
+  })
 
-  // Mock data para demonstração
-  const stats = [
-    { title: 'Usuários Totais', value: '1,247', change: '+12%', icon: Users },
-    { title: 'Alertas Gerados', value: '8,432', change: '+23%', icon: Activity },
-    { title: 'Precisão IA', value: '94.2%', change: '+1.1%', icon: TrendingUp },
-    { title: 'Uptime Sistema', value: '99.9%', change: '0%', icon: Shield }
+  // Dados mock para os gráficos
+  const weeklyUsers = [
+    { week: 'Sem 1', users: 120 },
+    { week: 'Sem 2', users: 180 },
+    { week: 'Sem 3', users: 240 },
+    { week: 'Sem 4', users: 320 },
+    { week: 'Sem 5', users: 280 },
+    { week: 'Sem 6', users: 380 },
+    { week: 'Sem 7', users: 420 }
   ]
 
-  const recentUsers = [
-    { email: 'user1@example.com', role: 'free', created: '2024-01-15', status: 'active' },
-    { email: 'user2@example.com', role: 'pro', created: '2024-01-14', status: 'active' },
-    { email: 'user3@example.com', role: 'elite', created: '2024-01-13', status: 'inactive' },
-    { email: 'user4@example.com', role: 'free', created: '2024-01-12', status: 'active' }
+  const roiEvolution = [
+    { month: 'Jan', roi: 65 },
+    { month: 'Fev', roi: 68 },
+    { month: 'Mar', roi: 72 },
+    { month: 'Abr', roi: 70 },
+    { month: 'Mai', roi: 74 },
+    { month: 'Jun', roi: 78 }
   ]
 
-  const systemLogs = [
-    { timestamp: '2024-01-15 10:30:00', level: 'INFO', message: 'Sistema de alertas executado com sucesso' },
-    { timestamp: '2024-01-15 10:25:00', level: 'WARNING', message: 'Alta latência detectada na API externa' },
-    { timestamp: '2024-01-15 10:20:00', level: 'INFO', message: 'Backup automático concluído' },
-    { timestamp: '2024-01-15 10:15:00', level: 'ERROR', message: 'Falha temporária na conexão com exchange' }
+  const planDistribution = [
+    { name: 'Free', value: 33, color: '#64748b' },
+    { name: 'Pro', value: 45, color: '#0ea5e9' },
+    { name: 'Elite', value: 22, color: '#06b6d4' }
   ]
 
-  if (user?.role !== 'admin') {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-center">
-          <Shield className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">Acesso Negado</h1>
-          <p className="text-gray-400">Você não tem permissão para acessar esta página.</p>
-        </div>
-      </div>
-    )
-  }
+  const engagementHours = [
+    { hour: '00h', engagement: 15 },
+    { hour: '06h', engagement: 25 },
+    { hour: '12h', engagement: 85 },
+    { hour: '18h', engagement: 95 },
+    { hour: '24h', engagement: 45 }
+  ]
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-[#1a1a1a] border-r border-[#2a2a2a] min-h-screen">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-white mb-6">Admin Panel</h2>
-            <nav className="space-y-2">
-              <button
-                onClick={() => setActiveTab('overview')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                  activeTab === 'overview' ? 'bg-green-500 text-black' : 'text-gray-300 hover:bg-[#2a2a2a]'
-                }`}
-              >
-                <Activity className="w-5 h-5" />
-                <span>Visão Geral</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('users')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                  activeTab === 'users' ? 'bg-green-500 text-black' : 'text-gray-300 hover:bg-[#2a2a2a]'
-                }`}
-              >
-                <Users className="w-5 h-5" />
-                <span>Usuários</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('system')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                  activeTab === 'system' ? 'bg-green-500 text-black' : 'text-gray-300 hover:bg-[#2a2a2a]'
-                }`}
-              >
-                <Database className="w-5 h-5" />
-                <span>Sistema</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                  activeTab === 'settings' ? 'bg-green-500 text-black' : 'text-gray-300 hover:bg-[#2a2a2a]'
-                }`}
-              >
-                <Settings className="w-5 h-5" />
-                <span>Configurações</span>
-              </button>
-            </nav>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Dashboard Administrativo</h1>
+          <p className="text-gray-400 mt-2">Visão geral da saúde da plataforma CryptoSageAI</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <div className="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg border border-green-500/30">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium">Sistema Operacional</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Usuários Ativos</p>
+              <p className="text-2xl font-bold text-white">{stats.activeUsers.toLocaleString()}</p>
+              <p className="text-green-400 text-sm mt-1">+12% vs ontem</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-blue-400" />
+            </div>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-6">
-          {/* Overview Tab */}
-          {activeTab === 'overview' && (
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-8">Visão Geral do Sistema</h1>
-              
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {stats.map((stat, index) => (
-                  <div key={index} className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <stat.icon className="w-8 h-8 text-green-400" />
-                      <span className="text-sm text-green-400">{stat.change}</span>
-                    </div>
-                    <h3 className="text-2xl font-bold text-white font-jetbrains mb-1">
-                      {stat.value}
-                    </h3>
-                    <p className="text-gray-400 text-sm">{stat.title}</p>
-                  </div>
+              <p className="text-gray-400 text-sm">Planos Pagos</p>
+              <p className="text-2xl font-bold text-white">{stats.paidPlans}%</p>
+              <p className="text-green-400 text-sm mt-1">+5% vs mês passado</p>
+            </div>
+            <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <CreditCard className="w-6 h-6 text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Alertas Enviados</p>
+              <p className="text-2xl font-bold text-white">{stats.alertsSent.toLocaleString()}</p>
+              <p className="text-blue-400 text-sm mt-1">Hoje</p>
+            </div>
+            <div className="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+              <Bell className="w-6 h-6 text-yellow-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Taxa de Sucesso IA</p>
+              <p className="text-2xl font-bold text-white">{stats.successRate}%</p>
+              <p className="text-green-400 text-sm mt-1">ROI positivo</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-purple-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Notícias Atualizadas</p>
+              <p className="text-2xl font-bold text-white">{stats.newsUpdated}</p>
+              <p className="text-blue-400 text-sm mt-1">Sincronizações hoje</p>
+            </div>
+            <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+              <Newspaper className="w-6 h-6 text-cyan-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Sessões da IA</p>
+              <p className="text-2xl font-bold text-white">{stats.aiSessions} min</p>
+              <p className="text-gray-400 text-sm mt-1">Tempo médio</p>
+            </div>
+            <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+              <Bot className="w-6 h-6 text-orange-400" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Novos Usuários por Semana */}
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <h3 className="text-lg font-semibold text-white mb-4">Novos Usuários por Semana</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={weeklyUsers}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="week" stroke="#9ca3af" />
+              <YAxis stroke="#9ca3af" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#fff'
+                }} 
+              />
+              <Bar dataKey="users" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Evolução do ROI */}
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <h3 className="text-lg font-semibold text-white mb-4">Evolução do ROI Médio Global</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={roiEvolution}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="month" stroke="#9ca3af" />
+              <YAxis stroke="#9ca3af" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#fff'
+                }} 
+              />
+              <Line 
+                type="monotone" 
+                dataKey="roi" 
+                stroke="#10b981" 
+                strokeWidth={3}
+                dot={{ fill: '#10b981', strokeWidth: 2, r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Distribuição de Planos */}
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <h3 className="text-lg font-semibold text-white mb-4">Distribuição de Planos</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie
+                data={planDistribution}
+                cx="50%"
+                cy="50%"
+                innerRadius={40}
+                outerRadius={80}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {planDistribution.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#fff'
+                }} 
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex justify-center space-x-4 mt-4">
+            {planDistribution.map((item, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                <span className="text-sm text-gray-400">{item.name} ({item.value}%)</span>
               </div>
+            ))}
+          </div>
+        </div>
 
-              {/* System Status */}
-              <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-white mb-4">Status do Sistema</h2>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">API Principal</span>
-                    <span className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <span className="text-green-400">Online</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Banco de Dados</span>
-                    <span className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <span className="text-green-400">Online</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Sistema de Alertas</span>
-                    <span className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                      <span className="text-yellow-400">Degradado</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Exchanges APIs</span>
-                    <span className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <span className="text-green-400">Online</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+        {/* Engajamento por Horário */}
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <h3 className="text-lg font-semibold text-white mb-4">Engajamento por Horário</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={engagementHours}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="hour" stroke="#9ca3af" />
+              <YAxis stroke="#9ca3af" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#fff'
+                }} 
+              />
+              <Bar dataKey="engagement" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
-          {/* Users Tab */}
-          {activeTab === 'users' && (
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-8">Gerenciamento de Usuários</h1>
-              
-              <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
-                <div className="p-6 border-b border-[#2a2a2a]">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold text-white">Usuários Recentes</h2>
-                    <button className="bg-green-500 hover:bg-green-600 text-black font-semibold px-4 py-2 rounded-lg transition-colors">
-                      Adicionar Usuário
-                    </button>
-                  </div>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-[#0a0a0a]">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                          E-mail
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                          Plano
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                          Criado em
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                          Ações
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#2a2a2a]">
-                      {recentUsers.map((user, index) => (
-                        <tr key={index} className="hover:bg-[#1f1f1f]">
-                          <td className="px-6 py-4 whitespace-nowrap text-white">
-                            {user.email}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              user.role === 'elite' ? 'bg-purple-400/10 text-purple-400' :
-                              user.role === 'pro' ? 'bg-blue-400/10 text-blue-400' :
-                              'bg-gray-400/10 text-gray-400'
-                            }`}>
-                              {user.role.toUpperCase()}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-300">
-                            {user.created}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              user.status === 'active' ? 'bg-green-400/10 text-green-400' : 'bg-red-400/10 text-red-400'
-                            }`}>
-                              {user.status === 'active' ? 'Ativo' : 'Inativo'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <button className="text-green-400 hover:text-green-300 mr-3">
-                              Editar
-                            </button>
-                            <button className="text-red-400 hover:text-red-300">
-                              Suspender
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+        {/* Status do Sistema */}
+        <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+          <h3 className="text-lg font-semibold text-white mb-4">Status do Sistema</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">API CoinGecko</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-green-400 text-sm">Online</span>
               </div>
             </div>
-          )}
-
-          {/* System Tab */}
-          {activeTab === 'system' && (
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-8">Logs do Sistema</h1>
-              
-              <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
-                <div className="p-6 border-b border-[#2a2a2a]">
-                  <h2 className="text-xl font-semibold text-white">Logs Recentes</h2>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-3">
-                    {systemLogs.map((log, index) => (
-                      <div key={index} className="flex items-start space-x-4 p-3 bg-[#0a0a0a] rounded-lg">
-                        <span className="text-xs text-gray-400 font-jetbrains min-w-[140px]">
-                          {log.timestamp}
-                        </span>
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          log.level === 'ERROR' ? 'bg-red-400/10 text-red-400' :
-                          log.level === 'WARNING' ? 'bg-yellow-400/10 text-yellow-400' :
-                          'bg-green-400/10 text-green-400'
-                        }`}>
-                          {log.level}
-                        </span>
-                        <span className="text-gray-300 flex-1">{log.message}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">API CryptoPanic</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-green-400 text-sm">Online</span>
               </div>
             </div>
-          )}
-
-          {/* Settings Tab */}
-          {activeTab === 'settings' && (
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-8">Configurações do Sistema</h1>
-              
-              <div className="space-y-6">
-                <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4">Configurações da IA</h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Threshold de Confiança
-                      </label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        defaultValue="75"
-                        className="w-full"
-                      />
-                      <div className="flex justify-between text-xs text-gray-400 mt-1">
-                        <span>0%</span>
-                        <span>75%</span>
-                        <span>100%</span>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Frequência de Análise (minutos)
-                      </label>
-                      <select className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg text-white">
-                        <option value="5">5 minutos</option>
-                        <option value="15">15 minutos</option>
-                        <option value="30">30 minutos</option>
-                        <option value="60">1 hora</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4">Manutenção</h2>
-                  <div className="space-y-4">
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
-                      Executar Backup Manual
-                    </button>
-                    <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2 rounded-lg transition-colors">
-                      Limpar Cache
-                    </button>
-                    <button className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
-                      Reiniciar Sistema
-                    </button>
-                  </div>
-                </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">IA Engine</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-green-400 text-sm">Ativo</span>
               </div>
             </div>
-          )}
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Database</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-green-400 text-sm">Conectado</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Notificações</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <span className="text-yellow-400 text-sm">Limitado</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-[#1e293b] rounded-xl p-6 border border-gray-700">
+        <h3 className="text-lg font-semibold text-white mb-4">Ações Rápidas</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button className="flex items-center space-x-3 p-4 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg border border-blue-500/30 transition-colors">
+            <Bot className="w-5 h-5 text-blue-400" />
+            <span className="text-white">Forçar Varredura IA</span>
+          </button>
+          <button className="flex items-center space-x-3 p-4 bg-green-500/20 hover:bg-green-500/30 rounded-lg border border-green-500/30 transition-colors">
+            <Newspaper className="w-5 h-5 text-green-400" />
+            <span className="text-white">Atualizar Notícias</span>
+          </button>
+          <button className="flex items-center space-x-3 p-4 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg border border-purple-500/30 transition-colors">
+            <Users className="w-5 h-5 text-purple-400" />
+            <span className="text-white">Relatório Usuários</span>
+          </button>
+          <button className="flex items-center space-x-3 p-4 bg-orange-500/20 hover:bg-orange-500/30 rounded-lg border border-orange-500/30 transition-colors">
+            <DollarSign className="w-5 h-5 text-orange-400" />
+            <span className="text-white">Relatório Financeiro</span>
+          </button>
         </div>
       </div>
     </div>
